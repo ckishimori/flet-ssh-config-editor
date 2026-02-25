@@ -1,17 +1,28 @@
 import flet as ft
+from sshconf import read_ssh_config
+from os.path import expanduser
 
 def main(page: ft.Page):
     page.title = "Search & Populate Form"
     
-    # 1. Mock Data
-    data = {'uiwebtest': {'hostname': '52.25.248.86', 'user': 'calvin_kishimori'}, 'uiwebprod': {'hostname': '35.80.157.73', 'user': 'calvin_kishimori'}, 'vyos': {'hostname': '172.18.172.1', 'user': 'vyos', 'port': '22'}, 'proxmox': {'hostname': '172.18.172.251', 'user': 'root', 'port': '22'}}
-    """
-    data = {
-        "Apple": {"type": "Fruit", "color": "Red", "port": "22"},
-        "Banana": {"type": "Fruit", "color": "Yellow", "port": "22"},
-        "Carrot": {"type": "Vegetable", "color": "Orange"}
-    }
-    """
+    # 1. Read Config and Prepare Data
+    conf = read_ssh_config(expanduser("~/.ssh/config"))
+    hosts = conf.hosts()
+    # print (hosts)
+    data = {}
+    default_settings = {"hostname" : "", "user" : "", "port" : "" }
+    for host in hosts:
+        # print(host)
+        settings = conf.host(host)
+        # print(settings)
+        settings_filter = [ 'hostname', 'user', 'port' ]
+        filtered_settings = {k: settings[k] for k in settings_filter if k in settings}
+        # print(filtered_settings)
+        data[host] = default_settings.copy()
+        # print (data[host])
+        data[host].update(filtered_settings)
+    
+    # print(data)
 
     # 2. Form Fields
     detail_host = ft.TextField(label="Host", read_only=True)
@@ -24,9 +35,10 @@ def main(page: ft.Page):
         search_bar.value = e.control.data
         selected_key = e.control.data
         selected_data = data[selected_key]
+        print(selected_key, selected_data)
         detail_host.value = selected_key
-        detail_hostname.value = selected_data["type"]
-        detail_user.value = selected_data["color"]
+        detail_hostname.value = selected_data["hostname"]
+        detail_user.value = selected_data["user"]
         detail_port.value = selected_data["port"]
         await close_anchor(selected_key)
         page.update()

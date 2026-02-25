@@ -3,7 +3,7 @@ from sshconf import read_ssh_config
 from os.path import expanduser
 
 def main(page: ft.Page):
-    page.title = "Hello World App"
+    page.title = "SSH Config Editor (Imperative)"
 
     conf = read_ssh_config(expanduser("~/.ssh/config"))
 

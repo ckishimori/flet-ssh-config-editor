@@ -20,7 +20,7 @@ class SshConfigEditor(ft.Column):
             self.hostname,
             self.user,
             self.port,
-            ft.ElevatedButton(text="Add", on_click=self.add_sshconfig_entry)
+            ft.ElevatedButton(content="Add", on_click=self.add_sshconfig_entry)
         ]
 
     def add_sshconfig_entry(self, e):
